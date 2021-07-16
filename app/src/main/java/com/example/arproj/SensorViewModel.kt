@@ -79,8 +79,9 @@ class SensorViewModel(application: Application): AndroidViewModel(application) {
 
                 val accText = "${String.format("%.6f", accValues[0])} ${String.format("%.6f", accValues[1])} ${String.format("%.6f", accValues[2])}"
                 val gyroText = "${String.format("%.6f", gyroValues[0])} ${String.format("%.6f", gyroValues[1])} ${String.format("%.6f", gyroValues[2])}"
+                val magnetText = "${String.format("%.6f", magnetValues[0])} ${String.format("%.6f", magnetValues[1])} ${String.format("%.6f", magnetValues[2])}"
 
-                postValue("$accText,$gyroText")
+                postValue("$accText,$gyroText,$magnetText")
             }
         }
 

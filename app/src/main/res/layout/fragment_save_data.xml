@@ -38,7 +38,7 @@
             android:layout_height="wrap_content"
             android:textSize="10dp"
             android:textColor="@color/black"
-            android:text="TEST1"
+            android:text="AnchorPose"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/linearLayout" />
@@ -51,7 +51,7 @@
             android:layout_marginEnd="20dp"
             android:textSize="10dp"
             android:textColor="@color/black"
-            android:text="TEST2"
+            android:text="CameraPose"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/tv_start_pos" />
@@ -64,7 +64,7 @@
             android:layout_marginEnd="20dp"
             android:textSize="10dp"
             android:textColor="@color/black"
-            android:text="TEST3"
+            android:text="Accelerometer"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/tv_cur_pos"/>
@@ -77,10 +77,23 @@
             android:layout_marginEnd="20dp"
             android:textSize="10dp"
             android:textColor="@color/black"
-            android:text="TEST3"
+            android:text="Gyroscope"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/tv_acc"/>
+
+        <TextView
+            android:id="@+id/tv_magnet"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="20dp"
+            android:layout_marginEnd="20dp"
+            android:textSize="10dp"
+            android:textColor="@color/black"
+            android:text="MagnetField"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/tv_gyro"/>
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -92,7 +105,7 @@
             android:weightSum="3"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/tv_gyro">
+            app:layout_constraintTop_toBottomOf="@+id/tv_magnet">
 
             <com.google.android.material.button.MaterialButton
                 android:text="Record"

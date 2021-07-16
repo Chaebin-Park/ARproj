@@ -40,6 +40,7 @@ class CustomArFragment: ArFragment() {
     private var poseList = arrayListOf<Array<String>>()
     private var accList = arrayListOf<Array<String>>()
     private var gyroList = arrayListOf<Array<String>>()
+    private var magnetList = arrayListOf<Array<String>>()
     private var anchorList = arrayListOf<Array<String>>()
 
     private fun clearData(){
@@ -66,6 +67,7 @@ class CustomArFragment: ArFragment() {
         val tvCurPose = view.rootView.findViewById<TextView>(R.id.tv_cur_pos)
         val tvAcc = view.rootView.findViewById<TextView>(R.id.tv_acc)
         val tvGyro = view.rootView.findViewById<TextView>(R.id.tv_gyro)
+        val tvMagnet = view.rootView.findViewById<TextView>(R.id.tv_magnet)
         val btnRecord = view.rootView.findViewById<Button>(R.id.btn_record)
         val btnSave = view.rootView.findViewById<Button>(R.id.btn_save)
 
@@ -80,11 +82,13 @@ class CustomArFragment: ArFragment() {
             val data = it.split(",")
             val accData = data[0].split(" ")
             val gyroData = data[1].split(" ")
+            val magnetData = data[2].split(" ")
             val poseData = arrayOf(timeStamp, poseX, poseY, poseZ)
 
             tvCurPose.text = "$poseX $poseY $poseZ"
             tvAcc.text = accData.toString()
             tvGyro.text = gyroData.toString()
+            tvMagnet.text = magnetData.toString()
 
             arSceneView.scene.camera.worldPosition
 
@@ -105,6 +109,7 @@ class CustomArFragment: ArFragment() {
                 // 가속도, 자이로, 카메라 위치, 앵커 위치 저장
                 accList.add(accData.toTypedArray())
                 gyroList.add(gyroData.toTypedArray())
+                magnetList.add(magnetData.toTypedArray())
                 poseList.add(poseData)
                 anchorList.add(anchorData)
             }
@@ -128,6 +133,7 @@ class CustomArFragment: ArFragment() {
             arActivity.saveData("Acc.csv", accList)
             arActivity.saveData("Gyro.csv", gyroList)
             arActivity.saveData("Pose.csv", poseList)
+            arActivity.saveData("Mag.csv", magnetList)
             arActivity.saveData("Anchor1.csv", anchorList)
             clearData()
         }
