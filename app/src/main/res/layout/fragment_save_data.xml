@@ -24,8 +24,8 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent">
             <androidx.fragment.app.FragmentContainerView
-                android:id="@+id/ar_fragment"
-                class="com.example.arproj.CustomArFragment"
+                android:id="@+id/save_ar_fragment"
+                class="com.example.arproj.view.CustomArFragment"
                 android:layout_width="match_parent"
                 android:layout_height="500dp" />
         </LinearLayout>

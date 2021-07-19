@@ -1,4 +1,4 @@
-package com.example.arproj
+package com.example.arproj.view
 
 import android.Manifest
 import android.annotation.SuppressLint
@@ -7,7 +7,6 @@ import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.net.Uri
-import android.os.AsyncTask
 import android.os.Build
 import android.os.Bundle
 import android.os.Environment
@@ -21,14 +20,12 @@ import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import com.example.arproj.helper.CsvHelper
+import com.example.arproj.R
 import com.example.arproj.databinding.ActivityArBinding
 import java.io.File
-import java.io.FileNotFoundException
-import java.io.FileOutputStream
-import java.io.IOException
 import java.text.SimpleDateFormat
 import java.util.*
-import kotlin.math.absoluteValue
 
 
 @Suppress("UNCHECKED_CAST")
@@ -39,19 +36,10 @@ class ArActivity : AppCompatActivity() {
     private lateinit var saveFragment: SaveDataFragment
     private lateinit var streamFragment: StreamDataFragment
 
-//    private val viewModel: SensorViewModel by lazy {
-//        ViewModelProvider(this@ArActivity, object : ViewModelProvider.Factory{
-//            override fun <T : ViewModel?> create(modelClass: Class<T>): T {
-//                return SensorViewModel(application) as T
-//            }
-//        }).get(SensorViewModel::class.java)
-//    }
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         arBinding = ActivityArBinding.inflate(layoutInflater)
         setContentView(binding.root)
-
 
         // 상단바 투명하게
         window.setFlags(WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS,
@@ -66,8 +54,6 @@ class ArActivity : AppCompatActivity() {
         // 프래그먼트 정의
         saveFragment = SaveDataFragment()
         streamFragment = StreamDataFragment()
-
-        Log.e("ZZZ", filesDir.toString() + "\n" + cacheDir.toString())
 
         // 최초 노출되는 프래그먼트 설정
         val transaction = supportFragmentManager.beginTransaction()
@@ -131,7 +117,7 @@ class ArActivity : AppCompatActivity() {
                     arrayOf(
                         Manifest.permission.WRITE_EXTERNAL_STORAGE,
                         Manifest.permission.READ_EXTERNAL_STORAGE),
-                    CustomArFragment.STORAGE_PERMISSION_CODE
+                    STORAGE_PERMISSION_CODE
                 )
             }
         }
@@ -152,12 +138,15 @@ class ArActivity : AppCompatActivity() {
             dir.mkdir()
         }
 
-        Log.e("ZZZ", "PATH: ${dir.path}")
         val csvHelper = CsvHelper(dir.path)
         csvHelper.writeData("${formatDate}_${fileName}", dataList)
     }
 
     private fun showToast(msg: String){
         Toast.makeText(this, msg, Toast.LENGTH_SHORT).show()
+    }
+
+    companion object{
+        const val STORAGE_PERMISSION_CODE = 1111
     }
 }

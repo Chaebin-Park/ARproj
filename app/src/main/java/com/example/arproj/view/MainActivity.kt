@@ -1,4 +1,4 @@
-package com.example.arproj
+package com.example.arproj.view
 
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity

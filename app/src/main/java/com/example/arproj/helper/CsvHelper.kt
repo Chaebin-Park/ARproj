@@ -1,4 +1,4 @@
-package com.example.arproj
+package com.example.arproj.helper
 
 import android.util.Log
 import com.opencsv.CSVWriter
@@ -7,7 +7,6 @@ import java.io.FileWriter
 import java.io.IOException
 
 class CsvHelper(private val filePath: String) {
-    private val TAG = this.javaClass.simpleName
 
     fun writeData(fileName: String, dataList: ArrayList<Array<String>>){
         try{
@@ -19,5 +18,9 @@ class CsvHelper(private val filePath: String) {
         } catch (e: IOException){
             Log.e(TAG, e.stackTraceToString())
         }
+    }
+
+    companion object{
+        val TAG: String = this::class.java.simpleName
     }
 }
