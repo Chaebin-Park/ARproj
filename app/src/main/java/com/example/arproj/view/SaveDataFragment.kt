@@ -107,7 +107,7 @@ class SaveDataFragment : Fragment() {
             if(isRecord && dataArray.isNotEmpty()) {
 
                 testList.add(dataArray.toTypedArray())
-
+                // 0~n번 앵커 순서대로 데이터 저장
                 for(i in dataArray.indices) {
                     val temp = dataArray[i].pose
                     val anchorData = arrayOf(
@@ -158,6 +158,7 @@ class SaveDataFragment : Fragment() {
             arActivity.saveData(formatDate, "Pose.csv", poseList)
             arActivity.saveData(formatDate, "Mag.csv", magnetList)
 
+            // 설치된 앵커 번호별로 파일 분리하여 데이터 저장
             for(i in dataArray.indices){
                 for(j in anchorList.indices){
                     if(anchorList[j][0] == i.toString()){

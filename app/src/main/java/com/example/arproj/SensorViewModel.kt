@@ -73,10 +73,6 @@ class SensorViewModel(application: Application): AndroidViewModel(application) {
             }
 
             if(isAccRunning || isGyroRuning){
-//                complementary(event.timestamp.toDouble())
-//                val accText = "${String.format("%.6f", accX)} ${String.format("%.6f", accY)} ${String.format("%.6f", accZ)} ${String.format("%.6f", accTotal)}"
-//                val gyroText = "${String.format("%.6f", roll)} ${String.format("%.6f", pitch)} ${String.format("%.6f", yaw)}"
-
                 val accText = "${String.format("%.6f", accValues[0])} ${String.format("%.6f", accValues[1])} ${String.format("%.6f", accValues[2])}"
                 val gyroText = "${String.format("%.6f", gyroValues[0])} ${String.format("%.6f", gyroValues[1])} ${String.format("%.6f", gyroValues[2])}"
                 val magnetText = "${String.format("%.6f", magnetValues[0])} ${String.format("%.6f", magnetValues[1])} ${String.format("%.6f", magnetValues[2])}"
@@ -106,7 +102,9 @@ class SensorViewModel(application: Application): AndroidViewModel(application) {
             sensorManager.unregisterListener(this)
         }
 
-        override fun onAccuracyChanged(sensor: Sensor?, accuracy: Int) {}
+        override fun onAccuracyChanged(sensor: Sensor?, accuracy: Int) {
+            Log.e(TAG, "onAccuracyChanged")
+        }
 
         private fun complementary(newTimeStamp: Double){
             isAccRunning = false
@@ -139,6 +137,10 @@ class SensorViewModel(application: Application): AndroidViewModel(application) {
             accTotal = sqrt(accX.pow(2) + accY.pow(2) + accZ.pow(2))
 
         }
+    }
+
+    companion object{
+        val TAG: String = this::class.java.simpleName
     }
 
 }
