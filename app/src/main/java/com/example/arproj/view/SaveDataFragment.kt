@@ -3,6 +3,7 @@ package com.example.arproj.view
 import android.annotation.SuppressLint
 import android.os.Build
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -21,7 +22,6 @@ import com.google.ar.sceneform.math.Vector3
 import com.google.ar.sceneform.rendering.Color
 import com.google.ar.sceneform.rendering.MaterialFactory
 import com.google.ar.sceneform.rendering.ShapeFactory
-import java.lang.reflect.GenericArrayType
 import java.text.SimpleDateFormat
 import java.util.*
 import kotlin.collections.ArrayList
@@ -40,9 +40,10 @@ class SaveDataFragment : Fragment() {
     private var magnetList = arrayListOf<Array<String>>()
     private var anchorList = arrayListOf<Array<String>>()
     private var testList = arrayListOf<Array<Anchor>>()
+    private var nodeList = arrayListOf<Node>()
     private lateinit var arActivity: ArActivity
     private lateinit var formatDate: String
-    private var sessionNumber: Int = 0
+    private var sessionNumber: Int = -1
 
     @SuppressLint("SetTextI18n", "SimpleDateFormat")
     @RequiresApi(Build.VERSION_CODES.R)
@@ -60,9 +61,11 @@ class SaveDataFragment : Fragment() {
             val anchor = hitResult.createAnchor()
             node = AnchorNode(anchor)
             node.setParent(arFragment.arSceneView.scene)
+            nodeList.add(node)
 
             dataArray.add(anchor)
-            if(dataArray.isNotEmpty()) bind.tvStartPos.text = dataArray[0].pose.toString()
+            if(dataArray.isNotEmpty())  bind.tvStartPos.text = dataArray[0].pose.toString()
+            else                        bind.tvStartPos.text = "No Anchor"
 
             MaterialFactory.makeOpaqueWithColor(context, Color(0.3f, 0.9f, 0.0f))
                 .thenAccept{ material ->
@@ -77,21 +80,28 @@ class SaveDataFragment : Fragment() {
 
         viewModel.accLiveData.observe(viewLifecycleOwner, {
             val timeStamp = System.currentTimeMillis().toString()
+            Log.e("ZZZ", timeStamp)
 
-            val poseX = arFragment.arSceneView.scene.camera.worldPosition.normalized().x.toString()
-            val poseY = arFragment.arSceneView.scene.camera.worldPosition.normalized().y.toString()
-            val poseZ = arFragment.arSceneView.scene.camera.worldPosition.normalized().z.toString()
+            val camera = arFragment.arSceneView.scene.camera
+
+            val poseTx = camera.worldPosition.normalized().x.toString()
+            val poseTy = camera.worldPosition.normalized().y.toString()
+            val poseTz = camera.worldPosition.normalized().z.toString()
+            val poseQx = camera.worldRotation.normalized().x.toString()
+            val poseQy = camera.worldRotation.normalized().y.toString()
+            val poseQz = camera.worldRotation.normalized().z.toString()
+            val poseQw = camera.worldRotation.normalized().w.toString()
 
             val data = it.split(",")
             val accData = data[0].split(" ")
             val gyroData = data[1].split(" ")
             val magnetData = data[2].split(" ")
-            val poseData = arrayOf(timeStamp, poseX, poseY, poseZ)
+            val poseData = arrayOf(sessionNumber.toString(), timeStamp, poseTx, poseTy, poseTz, poseQx, poseQy, poseQz, poseQw)
 
             bind.tvAcc.text     = accData.toString()
             bind.tvGyro.text    = gyroData.toString()
             bind.tvMagnet.text  = magnetData.toString()
-            bind.tvCurPos.text  = "$poseX $poseY $poseZ"
+            bind.tvCurPos.text  = "$sessionNumber $poseTx $poseTy $poseTz $poseQx $poseQy $poseQz $poseQw"
 
             // Record 버튼 눌렀고, 앵커가 하나 이상일 때
             if(isRecord && dataArray.isNotEmpty()) {
@@ -101,7 +111,7 @@ class SaveDataFragment : Fragment() {
                 for(i in dataArray.indices) {
                     val temp = dataArray[i].pose
                     val anchorData = arrayOf(
-                        i.toString(),
+                        sessionNumber.toString(),
                         timeStamp,
                         String.format("%.6f", temp.tx()),
                         String.format("%.6f", temp.ty()),
@@ -123,22 +133,24 @@ class SaveDataFragment : Fragment() {
         })
 
         bind.btnRecord.setOnClickListener{
-//            test = ArrayList(dataArray.size)
             val now = System.currentTimeMillis()
             val date = Date(now)
             val sdfNow = SimpleDateFormat("yyMMdd_HHmmss")
             formatDate = sdfNow.format(date)
 
+            sessionNumber += 1
+
+            showToast("Session: $sessionNumber")
+
             if(!isRecord)   isRecord = true
             bind.btnSave.isEnabled = true
-            it.isEnabled = false
+            showToast("Start Record")
         }
 
         bind.btnSave.setOnClickListener{
             val tmp = ArrayList<Array<String>>()
             isRecord = false
 
-            bind.btnRecord.isEnabled = true
             it.isEnabled = false
 
             arActivity.saveData(formatDate, "Acc.csv", accList)
@@ -155,8 +167,23 @@ class SaveDataFragment : Fragment() {
                 arActivity.saveData(formatDate, "Anchor${i}.csv", tmp)
                 tmp.clear()
             }
-
             clearData()
+            showToast("Save Data")
+        }
+
+        bind.fabRestore.setOnClickListener{
+            clearData()
+            dataArray.clear()
+            if(nodeList.isNotEmpty()){
+                for(node in nodeList){
+                    arFragment.arSceneView.scene.removeChild(node)
+                }
+            }
+
+            bind.btnSave.isEnabled = false
+            bind.btnRecord.isEnabled = true
+
+            showToast("Clear Data")
         }
 
         return bind.root

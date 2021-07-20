@@ -29,6 +29,18 @@
                 android:layout_width="match_parent"
                 android:layout_height="500dp" />
         </LinearLayout>
+
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
+            android:id="@+id/fab_restore"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:backgroundTint="@color/etri"
+            android:src="@drawable/ic_restore"
+            app:borderWidth="0dp"
+            app:tint="@null"
+            app:layout_constraintBottom_toBottomOf="@+id/linearLayout"
+            app:layout_constraintEnd_toEndOf="parent" />
+
         <TextView
             android:id="@+id/tv_start_pos"
             android:layout_marginTop="20dp"
