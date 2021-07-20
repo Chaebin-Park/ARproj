@@ -21,6 +21,10 @@ import com.google.ar.sceneform.math.Vector3
 import com.google.ar.sceneform.rendering.Color
 import com.google.ar.sceneform.rendering.MaterialFactory
 import com.google.ar.sceneform.rendering.ShapeFactory
+import java.lang.reflect.GenericArrayType
+import java.text.SimpleDateFormat
+import java.util.*
+import kotlin.collections.ArrayList
 
 class SaveDataFragment : Fragment() {
 
@@ -35,10 +39,12 @@ class SaveDataFragment : Fragment() {
     private var gyroList = arrayListOf<Array<String>>()
     private var magnetList = arrayListOf<Array<String>>()
     private var anchorList = arrayListOf<Array<String>>()
+    private var testList = arrayListOf<Array<Anchor>>()
+    private lateinit var arActivity: ArActivity
+    private lateinit var formatDate: String
+    private var sessionNumber: Int = 0
 
-    private var test = arrayListOf<Any>()
-
-    @SuppressLint("SetTextI18n")
+    @SuppressLint("SetTextI18n", "SimpleDateFormat")
     @RequiresApi(Build.VERSION_CODES.R)
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -46,6 +52,9 @@ class SaveDataFragment : Fragment() {
     ): View {
         bind = DataBindingUtil.inflate(inflater, R.layout.fragment_save_data, container, false)
         init(bind)
+
+        arActivity = activity as ArActivity
+
         arFragment = childFragmentManager.findFragmentById(R.id.save_ar_fragment) as CustomArFragment
         arFragment.setOnTapArPlaneListener{ hitResult, _, _ ->
             val anchor = hitResult.createAnchor()
@@ -86,45 +95,67 @@ class SaveDataFragment : Fragment() {
 
             // Record 버튼 눌렀고, 앵커가 하나 이상일 때
             if(isRecord && dataArray.isNotEmpty()) {
-                val temp = dataArray[0].pose
-                val anchorData = arrayOf(
-                    timeStamp,
-                    String.format("%.6f", temp.tx()),
-                    String.format("%.6f", temp.ty()),
-                    String.format("%.6f", temp.tz()),
-                    String.format("%.6f", temp.qx()),
-                    String.format("%.6f", temp.qy()),
-                    String.format("%.6f", temp.qz()),
-                    String.format("%.6f", temp.qw())
-                )
+
+                testList.add(dataArray.toTypedArray())
+
+                for(i in dataArray.indices) {
+                    val temp = dataArray[i].pose
+                    val anchorData = arrayOf(
+                        i.toString(),
+                        timeStamp,
+                        String.format("%.6f", temp.tx()),
+                        String.format("%.6f", temp.ty()),
+                        String.format("%.6f", temp.tz()),
+                        String.format("%.6f", temp.qx()),
+                        String.format("%.6f", temp.qy()),
+                        String.format("%.6f", temp.qz()),
+                        String.format("%.6f", temp.qw())
+                    )
+                    anchorList.add(anchorData)
+                }
 
                 // 가속도, 자이로, 카메라 위치, 앵커 위치 저장
                 accList.add(accData.toTypedArray())
                 gyroList.add(gyroData.toTypedArray())
                 magnetList.add(magnetData.toTypedArray())
                 poseList.add(poseData)
-                anchorList.add(anchorData)
             }
         })
 
         bind.btnRecord.setOnClickListener{
+//            test = ArrayList(dataArray.size)
+            val now = System.currentTimeMillis()
+            val date = Date(now)
+            val sdfNow = SimpleDateFormat("yyMMdd_HHmmss")
+            formatDate = sdfNow.format(date)
+
             if(!isRecord)   isRecord = true
             bind.btnSave.isEnabled = true
             it.isEnabled = false
         }
 
         bind.btnSave.setOnClickListener{
+            val tmp = ArrayList<Array<String>>()
             isRecord = false
-            val arActivity = activity as ArActivity
 
             bind.btnRecord.isEnabled = true
             it.isEnabled = false
 
-            arActivity.saveData("Acc.csv", accList)
-            arActivity.saveData("Gyro.csv", gyroList)
-            arActivity.saveData("Pose.csv", poseList)
-            arActivity.saveData("Mag.csv", magnetList)
-            arActivity.saveData("Anchor1.csv", anchorList)
+            arActivity.saveData(formatDate, "Acc.csv", accList)
+            arActivity.saveData(formatDate, "Gyro.csv", gyroList)
+            arActivity.saveData(formatDate, "Pose.csv", poseList)
+            arActivity.saveData(formatDate, "Mag.csv", magnetList)
+
+            for(i in dataArray.indices){
+                for(j in anchorList.indices){
+                    if(anchorList[j][0] == i.toString()){
+                        tmp.add(anchorList[j])
+                    }
+                }
+                arActivity.saveData(formatDate, "Anchor${i}.csv", tmp)
+                tmp.clear()
+            }
+
             clearData()
         }
 

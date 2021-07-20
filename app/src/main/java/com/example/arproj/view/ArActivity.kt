@@ -125,12 +125,7 @@ class ArActivity : AppCompatActivity() {
 
     @SuppressLint("SimpleDateFormat")
     @RequiresApi(Build.VERSION_CODES.R)
-    fun saveData(fileName: String, dataList: ArrayList<Array<String>>){
-        val now = System.currentTimeMillis()
-        val date = Date(now)
-        val sdfNow = SimpleDateFormat("yyMMdd_HHmmss")
-        val formatDate = sdfNow.format(date)
-
+    fun saveData(formatDate: String ,fileName: String, dataList: ArrayList<Array<String>>){
         val filePath = applicationContext.getExternalFilesDir(Environment.DIRECTORY_DOCUMENTS)?.path
         val dir = File("$filePath/$formatDate")
 
