@@ -1,3 +1,4 @@
+
 package com.example.arproj.view
 
 import android.annotation.SuppressLint
@@ -78,19 +79,18 @@ class SaveDataFragment : Fragment() {
                 }
         }
 
-        viewModel.accLiveData.observe(viewLifecycleOwner, {
+        viewModel.sensorLiveData.observe(viewLifecycleOwner, {
             val timeStamp = System.currentTimeMillis().toString()
-            Log.e("ZZZ", timeStamp)
 
             val camera = arFragment.arSceneView.scene.camera
 
-            val poseTx = camera.worldPosition.normalized().x.toString()
-            val poseTy = camera.worldPosition.normalized().y.toString()
-            val poseTz = camera.worldPosition.normalized().z.toString()
-            val poseQx = camera.worldRotation.normalized().x.toString()
-            val poseQy = camera.worldRotation.normalized().y.toString()
-            val poseQz = camera.worldRotation.normalized().z.toString()
-            val poseQw = camera.worldRotation.normalized().w.toString()
+            val poseTx = String.format("%.6f", camera.worldPosition.normalized().x)
+            val poseTy = String.format("%.6f", camera.worldPosition.normalized().y)
+            val poseTz = String.format("%.6f", camera.worldPosition.normalized().z)
+            val poseQx = String.format("%.6f", camera.worldRotation.normalized().x)
+            val poseQy = String.format("%.6f", camera.worldRotation.normalized().y)
+            val poseQz = String.format("%.6f", camera.worldRotation.normalized().z)
+            val poseQw = String.format("%.6f", camera.worldRotation.normalized().w)
 
             val data = it.split(",")
             val accData = data[0].split(" ")
@@ -101,7 +101,7 @@ class SaveDataFragment : Fragment() {
             bind.tvAcc.text     = accData.toString()
             bind.tvGyro.text    = gyroData.toString()
             bind.tvMagnet.text  = magnetData.toString()
-            bind.tvCurPos.text  = "$sessionNumber $poseTx $poseTy $poseTz $poseQx $poseQy $poseQz $poseQw"
+            bind.tvCurPos.text  = "$poseTx $poseTy $poseTz $poseQx $poseQy $poseQz $poseQw"
 
             // Record 버튼 눌렀고, 앵커가 하나 이상일 때
             if(isRecord && dataArray.isNotEmpty()) {
@@ -132,6 +132,7 @@ class SaveDataFragment : Fragment() {
             }
         })
 
+        // 기록 시작
         bind.btnRecord.setOnClickListener{
             val now = System.currentTimeMillis()
             val date = Date(now)
@@ -147,6 +148,7 @@ class SaveDataFragment : Fragment() {
             showToast("Start Record")
         }
 
+        // 저장
         bind.btnSave.setOnClickListener{
             val tmp = ArrayList<Array<String>>()
             isRecord = false
@@ -172,6 +174,7 @@ class SaveDataFragment : Fragment() {
             showToast("Save Data")
         }
 
+        // 초기화
         bind.fabRestore.setOnClickListener{
             clearData()
             dataArray.clear()

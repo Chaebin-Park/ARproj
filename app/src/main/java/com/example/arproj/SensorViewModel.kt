@@ -1,7 +1,6 @@
 package com.example.arproj
 
 import android.app.Application
-import android.app.UiAutomation
 import android.content.Context
 import android.hardware.Sensor
 import android.hardware.SensorEvent
@@ -10,16 +9,14 @@ import android.hardware.SensorManager
 import android.util.Log
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
-import java.lang.Math.atan2
 import kotlin.math.pow
 import kotlin.math.sqrt
 
 class SensorViewModel(application: Application): AndroidViewModel(application) {
 
-    val accLiveData = AccLiveData()
+    val sensorLiveData = SensorLiveData()
 
-    inner class AccLiveData: LiveData<String>(), SensorEventListener{
+    inner class SensorLiveData: LiveData<String>(), SensorEventListener{
         private val sensorManager
             get() = getApplication<Application>().getSystemService(Context.SENSOR_SERVICE) as SensorManager
 
@@ -50,10 +47,8 @@ class SensorViewModel(application: Application): AndroidViewModel(application) {
         private var dt = 0.0
 
         private var isAccRunning = false
-        private var isGyroRuning = false
+        private var isGyroRunning = false
         private var isMagnetRunning = false
-
-        private val NS2S = 1.0f/1000000000.0f
 
         override fun onSensorChanged(event: SensorEvent) {
 
@@ -64,7 +59,7 @@ class SensorViewModel(application: Application): AndroidViewModel(application) {
                 }
                 gyroscope -> {
                     System.arraycopy(event.values, 0, gyroValues, 0, event.values.size)
-                    if(!isGyroRuning)   isGyroRuning = true
+                    if(!isGyroRunning)   isGyroRunning = true
                 }
                 magnetField -> {
                     System.arraycopy(event.values, 0, magnetValues, 0, event.values.size)
@@ -72,7 +67,7 @@ class SensorViewModel(application: Application): AndroidViewModel(application) {
                 }
             }
 
-            if(isAccRunning || isGyroRuning){
+            if(isAccRunning || isGyroRunning){
                 val accText = "${String.format("%.6f", accValues[0])} ${String.format("%.6f", accValues[1])} ${String.format("%.6f", accValues[2])}"
                 val gyroText = "${String.format("%.6f", gyroValues[0])} ${String.format("%.6f", gyroValues[1])} ${String.format("%.6f", gyroValues[2])}"
                 val magnetText = "${String.format("%.6f", magnetValues[0])} ${String.format("%.6f", magnetValues[1])} ${String.format("%.6f", magnetValues[2])}"
@@ -108,7 +103,7 @@ class SensorViewModel(application: Application): AndroidViewModel(application) {
 
         private fun complementary(newTimeStamp: Double){
             isAccRunning = false
-            isGyroRuning = false
+            isGyroRunning = false
             isMagnetRunning = false
 
             if(timeStamp == 0.0){
@@ -141,6 +136,7 @@ class SensorViewModel(application: Application): AndroidViewModel(application) {
 
     companion object{
         val TAG: String = this::class.java.simpleName
+        const val NS2S: Float = 1.0f/1000000000.0f
     }
 
 }

@@ -6,6 +6,8 @@ import android.app.AlertDialog
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
@@ -23,7 +25,12 @@ import androidx.core.content.ContextCompat
 import com.example.arproj.helper.CsvHelper
 import com.example.arproj.R
 import com.example.arproj.databinding.ActivityArBinding
+import com.google.ar.core.AugmentedImageDatabase
+import com.google.ar.core.Config
+import com.google.ar.core.Session
+import com.google.ar.sceneform.FrameTime
 import java.io.File
+import java.io.InputStream
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -35,6 +42,7 @@ class ArActivity : AppCompatActivity() {
 
     private lateinit var saveFragment: SaveDataFragment
     private lateinit var streamFragment: StreamDataFragment
+    private lateinit var arFragment: CustomArFragment
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -102,12 +110,12 @@ class ArActivity : AppCompatActivity() {
                 AlertDialog.Builder(this)
                     .setTitle("Alert")
                     .setMessage("저장소 권한이 거부되었습니다.")
-                    .setNeutralButton("설정"){ _, i ->
+                    .setNeutralButton("설정"){ _, _ ->
                         val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS)
                         intent.data = Uri.parse("package:$packageName")
                         startActivity(intent)
                     }
-                    .setPositiveButton("확인") { _, i ->
+                    .setPositiveButton("확인") { _, _ ->
                         finish()
                     }
                     .setCancelable(false)
@@ -135,6 +143,33 @@ class ArActivity : AppCompatActivity() {
 
         val csvHelper = CsvHelper(dir.path)
         csvHelper.writeData("${formatDate}_${fileName}", dataList)
+    }
+
+    fun setAugmentedImageDb(config: Config, session: Session): Boolean {
+//        val augmentedImageDatabase = AugmentedImageDatabase(session)
+//
+//        augmentedImageDatabase.addImage("img1", loadAugmentedImages("img1.jpg"))
+//        augmentedImageDatabase.addImage("img2", loadAugmentedImages("img2.jpg"))
+//        augmentedImageDatabase.addImage("img3", loadAugmentedImages("img3.jpg"))
+
+//        config.augmentedImageDatabase = augmentedImageDatabase
+
+        val imageDatabase = this.assets.open("images.imgdb").use {
+            AugmentedImageDatabase.deserialize(session, it)
+        }
+
+        config.augmentedImageDatabase = imageDatabase
+
+        return true
+    }
+
+    /***
+     * Function to get the bitmap from a asset image
+     */
+    private fun loadAugmentedImages(imagePath: String): Bitmap {
+        val assetManger = assets
+        val inputStream: InputStream = assetManger.open(imagePath)
+        return BitmapFactory.decodeStream(inputStream)
     }
 
     private fun showToast(msg: String){
