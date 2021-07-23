@@ -134,11 +134,6 @@ class SaveDataFragment : Fragment() {
 
         // 기록 시작
         bind.btnRecord.setOnClickListener{
-            val now = System.currentTimeMillis()
-            val date = Date(now)
-            val sdfNow = SimpleDateFormat("yyMMdd_HHmmss")
-            formatDate = sdfNow.format(date)
-
             sessionNumber += 1
 
             showToast("Session: $sessionNumber")
@@ -150,6 +145,11 @@ class SaveDataFragment : Fragment() {
 
         // 저장
         bind.btnSave.setOnClickListener{
+            val now = System.currentTimeMillis()
+            val date = Date(now)
+            val sdfNow = SimpleDateFormat("yyMMdd_HHmmss")
+            formatDate = sdfNow.format(date)
+
             val tmp = ArrayList<Array<String>>()
             isRecord = false
 
@@ -196,6 +196,7 @@ class SaveDataFragment : Fragment() {
     private fun clearData(){
         poseList.clear()
         accList.clear()
+        magnetList.clear()
         gyroList.clear()
         anchorList.clear()
     }

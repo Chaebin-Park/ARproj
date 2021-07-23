@@ -14,15 +14,7 @@
         android:layout_height="match_parent"
         android:background="@color/white">
 
-        <View
-            android:id="@+id/tracking_state_view"
-            android:layout_width="50dp"
-            android:layout_height="50dp"
-            android:background="@color/red"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="@+id/linearLayout" />
-
-        <LinearLayout
+        <FrameLayout
             android:id="@+id/linearLayout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -36,7 +28,13 @@
                 class="com.example.arproj.view.CustomAugmentedImageArFragment"
                 android:layout_width="match_parent"
                 android:layout_height="550dp" />
-        </LinearLayout>
+
+            <ImageView
+                android:id="@+id/tracking_state_view"
+                android:layout_width="50dp"
+                android:layout_height="50dp"
+                android:background="@color/red"/>
+        </FrameLayout>
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -46,34 +44,20 @@
             android:layout_marginEnd="20dp"
             android:orientation="horizontal"
             android:weightSum="3"
+            android:gravity="center"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/linearLayout">
 
             <com.google.android.material.button.MaterialButton
-                android:text="Stream"
+                android:text="Save"
                 style="?materialButtonOutlinedStyle"
                 android:textColor="@color/etri"
                 android:layout_weight="1"
-                android:id="@+id/btn_stream"
+                android:id="@+id/btn_save"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                app:strokeWidth="2dp"
-                app:strokeColor="@color/etri"/>
-
-            <View
-                android:layout_weight="1"
-                android:layout_width="0dp"
-                android:layout_height="0dp"/>
-
-            <com.google.android.material.button.MaterialButton
-                android:text="Connect"
-                style="?materialButtonOutlinedStyle"
-                android:textColor="@color/etri"
-                android:layout_weight="1"
-                android:id="@+id/btn_connect"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
+                android:enabled="false"
                 app:strokeWidth="2dp"
                 app:strokeColor="@color/etri"/>
 
