@@ -33,7 +33,7 @@
             app:layout_constraintTop_toTopOf="parent">
             <androidx.fragment.app.FragmentContainerView
                 android:id="@+id/stream_ar_fragment"
-                class="com.example.arproj.view.CustomArFragment"
+                class="com.example.arproj.view.CustomAugmentedImageArFragment"
                 android:layout_width="match_parent"
                 android:layout_height="550dp" />
         </LinearLayout>

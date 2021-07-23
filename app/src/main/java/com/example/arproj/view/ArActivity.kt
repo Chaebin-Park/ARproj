@@ -42,7 +42,6 @@ class ArActivity : AppCompatActivity() {
 
     private lateinit var saveFragment: SaveDataFragment
     private lateinit var streamFragment: StreamDataFragment
-    private lateinit var arFragment: CustomArFragment
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -146,13 +145,6 @@ class ArActivity : AppCompatActivity() {
     }
 
     fun setAugmentedImageDb(config: Config, session: Session): Boolean {
-//        val augmentedImageDatabase = AugmentedImageDatabase(session)
-//
-//        augmentedImageDatabase.addImage("img1", loadAugmentedImages("img1.jpg"))
-//        augmentedImageDatabase.addImage("img2", loadAugmentedImages("img2.jpg"))
-//        augmentedImageDatabase.addImage("img3", loadAugmentedImages("img3.jpg"))
-
-//        config.augmentedImageDatabase = augmentedImageDatabase
 
         val imageDatabase = this.assets.open("images.imgdb").use {
             AugmentedImageDatabase.deserialize(session, it)

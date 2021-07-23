@@ -17,11 +17,13 @@ import com.example.arproj.databinding.FragmentStreamDataBinding
 import com.google.ar.core.*
 import com.google.ar.core.exceptions.RecordingFailedException
 import com.google.ar.sceneform.AnchorNode
+import com.google.ar.sceneform.FrameTime
 import com.google.ar.sceneform.Node
 import com.google.ar.sceneform.math.Vector3
 import com.google.ar.sceneform.rendering.Color
 import com.google.ar.sceneform.rendering.MaterialFactory
 import com.google.ar.sceneform.rendering.ShapeFactory
+import org.koin.core.qualifier.named
 import java.io.File
 import java.lang.reflect.InvocationTargetException
 
@@ -30,11 +32,11 @@ class StreamDataFragment : Fragment() {
 
     private lateinit var bind: FragmentStreamDataBinding
     private lateinit var viewModel: SensorViewModel
-    private lateinit var arFragment: CustomArFragment
+    private lateinit var arFragment: CustomAugmentedImageArFragment
     private lateinit var node: AnchorNode
-    private lateinit var imageDatabase: AugmentedImageDatabase
-    private lateinit var config: Config
-    private lateinit var session: Session
+//    private lateinit var imageDatabase: AugmentedImageDatabase
+//    private lateinit var config: Config
+//    private lateinit var session: Session
 
     private val dataArray = arrayListOf<Anchor>()
 
@@ -45,55 +47,7 @@ class StreamDataFragment : Fragment() {
         bind = DataBindingUtil.inflate(inflater, R.layout.fragment_stream_data, container, false)
         init(bind)
 
-        arFragment = childFragmentManager.findFragmentById(R.id.stream_ar_fragment) as CustomArFragment
-
-//        val session = arFragment.arSceneView.session
-//        val config = Config(session)
-//        imageDatabase = requireContext().assets.open("images.imgdb").use {
-//            AugmentedImageDatabase.deserialize(session, it)
-//        }
-//        config.augmentedImageDatabase = imageDatabase
-//        session?.configure(config)
-//
-//        val frame = session?.update()
-//        val updatedAugmentedImages = frame?.getUpdatedTrackables(AugmentedImage::class.java)
-//
-//        for(img in updatedAugmentedImages!!){
-//            when(img.trackingState){
-//                TrackingState.PAUSED -> {
-//                    bind.trackingStateView.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.green))
-//                }
-//                TrackingState.TRACKING -> {
-//                    bind.trackingStateView.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.red))
-//                }
-//                TrackingState.STOPPED -> {
-//
-//                }
-//            }
-//        }
-
-        if(session != null){
-
-        }
-
-        arFragment.setOnTapArPlaneListener{ hitResult, _, _ ->
-            val anchor = hitResult.createAnchor()
-            node = AnchorNode(anchor)
-            node.setParent(arFragment.arSceneView.scene)
-
-            dataArray.add(anchor)
-            if(dataArray.isNotEmpty()) showToast(dataArray[dataArray.size-1].pose.toString())
-
-            MaterialFactory.makeOpaqueWithColor(context, Color(0.3f, 0.9f, 0.0f))
-                .thenAccept{material ->
-                    val sphere = ShapeFactory.makeSphere(0.02f, Vector3.zero(), material)
-                    Node().apply {
-                        setParent(node)
-                        localPosition = Vector3.zero()
-                        renderable = sphere
-                    }
-                }
-        }
+        arFragment = childFragmentManager.findFragmentById(bind.streamArFragment.id) as CustomAugmentedImageArFragment
 
         bind.btnConnect.setOnClickListener{
 
@@ -106,14 +60,52 @@ class StreamDataFragment : Fragment() {
         return bind.root
     }
 
+    override fun onResume() {
+        super.onResume()
+        arFragment.planeDiscoveryController.hide()
+        arFragment.arSceneView.scene.addOnUpdateListener(this::onUpdateFrame)
+    }
+
+    private fun onUpdateFrame(frameTime: FrameTime){
+        val arFrame: Frame? = arFragment.arSceneView.arFrame
+
+        arFrame?.let { frame ->
+            val augmentedImages: Collection<AugmentedImage> = frame.getUpdatedTrackables(AugmentedImage::class.java)
+            Log.e("ZZZ", "${frameTime.deltaSeconds}")
+
+            for(image in augmentedImages){
+                when(image.trackingState){
+                    TrackingState.TRACKING -> {
+                    }
+                    TrackingState.PAUSED -> {
+                        when(image.name){
+                            "img1.jpg" -> {
+                                showToast("img1")
+                            }
+                            "img2.jpg" -> {
+                                showToast("img2")
+                            }
+                            "img3.jpg" -> {
+                                showToast("img3")
+                            }
+                        }
+                    }
+                    else -> {
+                        showToast(";;")
+                    }
+                }
+            }
+        }
+    }
+
     private fun init(binding: FragmentStreamDataBinding){
         viewModel = ViewModelProvider(this).get(SensorViewModel::class.java)
         binding.sensorViewModel = viewModel
         binding.lifecycleOwner = this
     }
 
-    private fun showToast(content: String){
-        Toast.makeText(context, content, Toast.LENGTH_SHORT).show()
+    private fun showToast(message: String){
+        Toast.makeText(context, message, Toast.LENGTH_SHORT).show()
     }
 
 }
