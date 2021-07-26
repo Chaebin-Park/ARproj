@@ -4,14 +4,14 @@
 
     <item
         android:id="@+id/save_data"
-        android:title="Save Data"
-        app:showAsAction="never|withText"
+        android:title="Save SensorData"
+        app:showAsAction="withText"
         />
 
     <item
-        android:id="@+id/stream_data"
-        android:title="Stream Data"
-        app:showAsAction="never|withText"
+        android:id="@+id/augmented_image"
+        android:title="Augmented Image"
+        app:showAsAction="withText"
         />
 
 </menu>

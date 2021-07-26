@@ -13,7 +13,6 @@ import android.os.Build
 import android.os.Bundle
 import android.os.Environment
 import android.provider.Settings
-import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import android.view.WindowManager
@@ -25,13 +24,12 @@ import androidx.core.content.ContextCompat
 import com.example.arproj.helper.CsvHelper
 import com.example.arproj.R
 import com.example.arproj.databinding.ActivityArBinding
+import com.example.arproj.helper.CsvWriter
 import com.google.ar.core.AugmentedImageDatabase
 import com.google.ar.core.Config
 import com.google.ar.core.Session
-import com.google.ar.sceneform.FrameTime
 import java.io.File
 import java.io.InputStream
-import java.text.SimpleDateFormat
 import java.util.*
 
 
@@ -41,7 +39,7 @@ class ArActivity : AppCompatActivity() {
     private val binding get() = arBinding!!
 
     private lateinit var saveFragment: SaveDataFragment
-    private lateinit var streamFragment: StreamDataFragment
+    private lateinit var augmentedImageFragment: AugmentedImageFragment
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -60,7 +58,7 @@ class ArActivity : AppCompatActivity() {
 
         // 프래그먼트 정의
         saveFragment = SaveDataFragment()
-        streamFragment = StreamDataFragment()
+        augmentedImageFragment = AugmentedImageFragment()
 
         // 최초 노출되는 프래그먼트 설정
         val transaction = supportFragmentManager.beginTransaction()
@@ -92,9 +90,9 @@ class ArActivity : AppCompatActivity() {
                 showToast("Save Data")
                 transaction.replace(R.id.ar_frame_layout, saveFragment).commit()
             }
-            R.id.stream_data -> {
-                showToast("Stream Data")
-                transaction.replace(R.id.ar_frame_layout, streamFragment).commit()
+            R.id.augmented_image -> {
+                showToast("Augmented Image")
+                transaction.replace(R.id.ar_frame_layout, augmentedImageFragment).commit()
             }
         }
 
@@ -130,18 +128,14 @@ class ArActivity : AppCompatActivity() {
         }
     }
 
-    @SuppressLint("SimpleDateFormat")
-    @RequiresApi(Build.VERSION_CODES.R)
-    fun saveData(formatDate: String ,fileName: String, dataList: ArrayList<Array<String>>){
+    fun saveArrayToCSV(formatDate: String ,fileName: String, dataList: ArrayList<Array<*>>){
         val filePath = applicationContext.getExternalFilesDir(Environment.DIRECTORY_DOCUMENTS)?.path
         val dir = File("$filePath/$formatDate")
-
         if(!dir.exists()){
             dir.mkdir()
         }
-
-        val csvHelper = CsvHelper(dir.path)
-        csvHelper.writeData("${formatDate}_${fileName}", dataList)
+        val csvWriter = CsvWriter(dir.path)
+        csvWriter.write("${formatDate}_${fileName}", dataList)
     }
 
     fun setAugmentedImageDb(config: Config, session: Session): Boolean {

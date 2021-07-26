@@ -6,17 +6,18 @@
     android:layout_height="match_parent"
     tools:context=".view.ArActivity">
 
+    <FrameLayout
+        android:id="@+id/ar_frame_layout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"/>
+
     <androidx.appcompat.widget.Toolbar
         android:id="@+id/toolbar"
         android:layout_width="match_parent"
         android:layout_height="?actionBarSize"
         android:minHeight="?actionBarSize"
+
         app:popupTheme="@style/ThemeOverlay.MaterialComponents.ActionBar"
         android:theme="@style/Widget.MaterialComponents.Toolbar"/>
-
-    <FrameLayout
-        android:id="@+id/ar_frame_layout"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"/>
 
 </FrameLayout>

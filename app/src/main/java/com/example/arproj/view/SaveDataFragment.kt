@@ -4,7 +4,6 @@ package com.example.arproj.view
 import android.annotation.SuppressLint
 import android.os.Build
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -26,23 +25,29 @@ import com.google.ar.sceneform.rendering.ShapeFactory
 import java.text.SimpleDateFormat
 import java.util.*
 import kotlin.collections.ArrayList
+import kotlin.math.round
 
 class SaveDataFragment : Fragment() {
 
+    private lateinit var arActivity: ArActivity
+    private lateinit var arFragment: CustomArFragment
     private lateinit var bind: FragmentSaveDataBinding
     private lateinit var viewModel: SensorViewModel
-    private lateinit var arFragment: CustomArFragment
+
     private lateinit var node: AnchorNode
     private var isRecord = false
-    private val dataArray = arrayListOf<Anchor>()
-    private var poseList = arrayListOf<Array<String>>()
-    private var accList = arrayListOf<Array<String>>()
-    private var gyroList = arrayListOf<Array<String>>()
-    private var magnetList = arrayListOf<Array<String>>()
-    private var anchorList = arrayListOf<Array<String>>()
+
+    private val anchorList = arrayListOf<Anchor>()
+    private var poseList = arrayListOf<Array<*>>()
+    private var accList = arrayListOf<Array<*>>()
+    private var gyroList = arrayListOf<Array<*>>()
+    private var magnetList = arrayListOf<Array<*>>()
+    private var anchorDataList = arrayListOf<Array<String>>()
     private var testList = arrayListOf<Array<Anchor>>()
     private var nodeList = arrayListOf<Node>()
-    private lateinit var arActivity: ArActivity
+
+    private var test = arrayListOf<Array<*>>()
+
     private lateinit var formatDate: String
     private var sessionNumber: Int = -1
 
@@ -64,9 +69,9 @@ class SaveDataFragment : Fragment() {
             node.setParent(arFragment.arSceneView.scene)
             nodeList.add(node)
 
-            dataArray.add(anchor)
-            if(dataArray.isNotEmpty())  bind.tvStartPos.text = dataArray[0].pose.toString()
-            else                        bind.tvStartPos.text = "No Anchor"
+            anchorList.add(anchor)
+            if(anchorList.isNotEmpty())  bind.tvStartPos.text = anchorList[0].pose.toString()
+            else    bind.tvStartPos.text = "No Anchor"
 
             MaterialFactory.makeOpaqueWithColor(context, Color(0.3f, 0.9f, 0.0f))
                 .thenAccept{ material ->
@@ -84,19 +89,19 @@ class SaveDataFragment : Fragment() {
 
             val camera = arFragment.arSceneView.scene.camera
 
-            val poseTx = String.format("%.6f", camera.worldPosition.normalized().x)
-            val poseTy = String.format("%.6f", camera.worldPosition.normalized().y)
-            val poseTz = String.format("%.6f", camera.worldPosition.normalized().z)
-            val poseQx = String.format("%.6f", camera.worldRotation.normalized().x)
-            val poseQy = String.format("%.6f", camera.worldRotation.normalized().y)
-            val poseQz = String.format("%.6f", camera.worldRotation.normalized().z)
-            val poseQw = String.format("%.6f", camera.worldRotation.normalized().w)
+            val poseTx = round(camera.worldPosition.normalized().x * AugmentedImageFragment.DEC) / AugmentedImageFragment.DEC
+            val poseTy = round(camera.worldPosition.normalized().y * AugmentedImageFragment.DEC) / AugmentedImageFragment.DEC
+            val poseTz = round(camera.worldPosition.normalized().z * AugmentedImageFragment.DEC) / AugmentedImageFragment.DEC
+            val poseQx = round(camera.worldRotation.normalized().x * AugmentedImageFragment.DEC) / AugmentedImageFragment.DEC
+            val poseQy = round(camera.worldRotation.normalized().y * AugmentedImageFragment.DEC) / AugmentedImageFragment.DEC
+            val poseQz = round(camera.worldRotation.normalized().z * AugmentedImageFragment.DEC) / AugmentedImageFragment.DEC
+            val poseQw = round(camera.worldRotation.normalized().w * AugmentedImageFragment.DEC) / AugmentedImageFragment.DEC
 
-            val data = it.split(",")
-            val accData = data[0].split(" ")
-            val gyroData = data[1].split(" ")
-            val magnetData = data[2].split(" ")
-            val poseData = arrayOf(sessionNumber.toString(), timeStamp, poseTx, poseTy, poseTz, poseQx, poseQy, poseQz, poseQw)
+            val poseData = arrayOf(sessionNumber, timeStamp, poseTx, poseTy, poseTz, poseQx, poseQy, poseQz, poseQw)
+
+            val accData = arrayOf(timeStamp, it.ax, it.ay, it.az)
+            val gyroData = arrayOf(timeStamp, it.gx, it.gy, it.gz)
+            val magnetData = arrayOf(timeStamp, it.mx, it.my, it.mz)
 
             bind.tvAcc.text     = accData.toString()
             bind.tvGyro.text    = gyroData.toString()
@@ -104,12 +109,12 @@ class SaveDataFragment : Fragment() {
             bind.tvCurPos.text  = "$poseTx $poseTy $poseTz $poseQx $poseQy $poseQz $poseQw"
 
             // Record 버튼 눌렀고, 앵커가 하나 이상일 때
-            if(isRecord && dataArray.isNotEmpty()) {
+            if(isRecord && anchorList.isNotEmpty()) {
 
-                testList.add(dataArray.toTypedArray())
+                testList.add(anchorList.toTypedArray())
                 // 0~n번 앵커 순서대로 데이터 저장
-                for(i in dataArray.indices) {
-                    val temp = dataArray[i].pose
+                for(i in anchorList.indices) {
+                    val temp = anchorList[i].pose
                     val anchorData = arrayOf(
                         sessionNumber.toString(),
                         timeStamp,
@@ -121,14 +126,17 @@ class SaveDataFragment : Fragment() {
                         String.format("%.6f", temp.qz()),
                         String.format("%.6f", temp.qw())
                     )
-                    anchorList.add(anchorData)
+                    anchorDataList.add(anchorData)
                 }
 
                 // 가속도, 자이로, 카메라 위치, 앵커 위치 저장
-                accList.add(accData.toTypedArray())
-                gyroList.add(gyroData.toTypedArray())
-                magnetList.add(magnetData.toTypedArray())
+
+                accList.add(accData)
+                gyroList.add(gyroData)
+                magnetList.add(magnetData)
                 poseList.add(poseData)
+
+                test.add(accData)
             }
         })
 
@@ -140,7 +148,6 @@ class SaveDataFragment : Fragment() {
 
             if(!isRecord)   isRecord = true
             bind.btnSave.isEnabled = true
-            showToast("Start Record")
         }
 
         // 저장
@@ -150,24 +157,24 @@ class SaveDataFragment : Fragment() {
             val sdfNow = SimpleDateFormat("yyMMdd_HHmmss")
             formatDate = sdfNow.format(date)
 
-            val tmp = ArrayList<Array<String>>()
+            val tmp = ArrayList<Array<*>>()
             isRecord = false
 
             it.isEnabled = false
 
-            arActivity.saveData(formatDate, "Acc.csv", accList)
-            arActivity.saveData(formatDate, "Gyro.csv", gyroList)
-            arActivity.saveData(formatDate, "Pose.csv", poseList)
-            arActivity.saveData(formatDate, "Mag.csv", magnetList)
+            arActivity.saveArrayToCSV(formatDate, "Acc.csv", accList)
+            arActivity.saveArrayToCSV(formatDate, "Gyro.csv", gyroList)
+            arActivity.saveArrayToCSV(formatDate, "Pose.csv", poseList)
+            arActivity.saveArrayToCSV(formatDate, "Mag.csv", magnetList)
 
             // 설치된 앵커 번호별로 파일 분리하여 데이터 저장
-            for(i in dataArray.indices){
-                for(j in anchorList.indices){
-                    if(anchorList[j][0] == i.toString()){
-                        tmp.add(anchorList[j])
+            for(i in anchorList.indices){
+                for(j in anchorDataList.indices){
+                    if(anchorDataList[j][0] == i.toString()){
+                        tmp.add(anchorDataList[j])
                     }
                 }
-                arActivity.saveData(formatDate, "Anchor${i}.csv", tmp)
+                arActivity.saveArrayToCSV(formatDate, "Anchor${i}.csv", tmp)
                 tmp.clear()
             }
             clearData()
@@ -177,7 +184,7 @@ class SaveDataFragment : Fragment() {
         // 초기화
         bind.fabRestore.setOnClickListener{
             clearData()
-            dataArray.clear()
+            anchorList.clear()
             if(nodeList.isNotEmpty()){
                 for(node in nodeList){
                     arFragment.arSceneView.scene.removeChild(node)
@@ -198,7 +205,7 @@ class SaveDataFragment : Fragment() {
         accList.clear()
         magnetList.clear()
         gyroList.clear()
-        anchorList.clear()
+        anchorDataList.clear()
     }
 
     private fun init(binding: FragmentSaveDataBinding){
@@ -209,5 +216,9 @@ class SaveDataFragment : Fragment() {
 
     private fun showToast(content: String){
         Toast.makeText(context, content, Toast.LENGTH_SHORT).show()
+    }
+
+    companion object{
+        const val DEC: Int = 100000
     }
 }

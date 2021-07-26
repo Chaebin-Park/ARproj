@@ -16,7 +16,7 @@ class SensorViewModel(application: Application): AndroidViewModel(application) {
 
     val sensorLiveData = SensorLiveData()
 
-    inner class SensorLiveData: LiveData<String>(), SensorEventListener{
+    inner class SensorLiveData: LiveData<SensorData>(), SensorEventListener{
         private val sensorManager
             get() = getApplication<Application>().getSystemService(Context.SENSOR_SERVICE) as SensorManager
 
@@ -27,24 +27,6 @@ class SensorViewModel(application: Application): AndroidViewModel(application) {
         private var accValues = FloatArray(3)
         private var gyroValues = FloatArray(3)
         private var magnetValues = FloatArray(3)
-
-        private var accX = 0.0f
-        private var accY = 0.0f
-        private var accZ = 0.0f
-        private var accTotal = 0.0f
-        private var temp = 0.0
-        private var tempX = 0.0f
-        private var tempY = 0.0f
-        private var tempZ = 0.0f
-        private var coe = 0.2f
-        private var alpha = 0.8f
-        private var accPitch = 0.0
-        private var accRoll = 0.0
-        private var pitch = 0.0
-        private var roll = 0.0
-        private var yaw = 0.0
-        private var timeStamp = 0.0
-        private var dt = 0.0
 
         private var isAccRunning = false
         private var isGyroRunning = false
@@ -67,12 +49,9 @@ class SensorViewModel(application: Application): AndroidViewModel(application) {
                 }
             }
 
-            if(isAccRunning || isGyroRunning){
-                val accText = "${String.format("%.6f", accValues[0])} ${String.format("%.6f", accValues[1])} ${String.format("%.6f", accValues[2])}"
-                val gyroText = "${String.format("%.6f", gyroValues[0])} ${String.format("%.6f", gyroValues[1])} ${String.format("%.6f", gyroValues[2])}"
-                val magnetText = "${String.format("%.6f", magnetValues[0])} ${String.format("%.6f", magnetValues[1])} ${String.format("%.6f", magnetValues[2])}"
-
-                postValue("$accText,$gyroText,$magnetText")
+            if(isAccRunning || isGyroRunning || isMagnetRunning){
+                val sensorData = SensorData(accValues[0], accValues[1], accValues[2], gyroValues[0], gyroValues[1], gyroValues[2], magnetValues[0], magnetValues[1], magnetValues[2])
+                postValue(sensorData)
             }
         }
 
@@ -100,43 +79,23 @@ class SensorViewModel(application: Application): AndroidViewModel(application) {
         override fun onAccuracyChanged(sensor: Sensor?, accuracy: Int) {
             Log.e(TAG, "onAccuracyChanged")
         }
-
-        private fun complementary(newTimeStamp: Double){
-            isAccRunning = false
-            isGyroRunning = false
-            isMagnetRunning = false
-
-            if(timeStamp == 0.0){
-                timeStamp = newTimeStamp
-                return
-            }
-            dt = (newTimeStamp - timeStamp) * NS2S
-            timeStamp = newTimeStamp
-
-            accPitch = -kotlin.math.atan2(accValues[0].toDouble(), accValues[2].toDouble()) * 180.0/Math.PI
-            accRoll = kotlin.math.atan2(accValues[1].toDouble(), accValues[2].toDouble()) * 180/Math.PI
-
-            temp = (1/coe) * (accPitch - pitch) + gyroValues[1]
-            pitch += temp * dt
-            temp = (1/coe) * (accRoll - roll)+ gyroValues[0]
-            roll += temp * dt
-            yaw = gyroValues[2].toDouble()
-
-            tempX = alpha * tempX + (1-alpha) * accValues[0]
-            tempY = alpha * tempY + (1-alpha) * accValues[1]
-            tempZ = alpha * tempZ + (1-alpha) * accValues[2]
-
-            accX = accValues[0] - tempX
-            accY = accValues[1] - tempY
-            accZ = accValues[2] - tempZ
-            accTotal = sqrt(accX.pow(2) + accY.pow(2) + accZ.pow(2))
-
-        }
     }
 
     companion object{
         val TAG: String = this::class.java.simpleName
         const val NS2S: Float = 1.0f/1000000000.0f
     }
+
+    data class SensorData(
+        val ax: Float,
+        val ay: Float,
+        val az: Float,
+        val gx: Float,
+        val gy: Float,
+        val gz: Float,
+        val mx: Float,
+        val my: Float,
+        val mz: Float,
+    )
 
 }
