@@ -4,6 +4,7 @@ package com.example.arproj.view
 import android.annotation.SuppressLint
 import android.os.Build
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -45,6 +46,10 @@ class SaveDataFragment : Fragment() {
     private var anchorDataList = arrayListOf<Array<String>>()
     private var testList = arrayListOf<Array<Anchor>>()
     private var nodeList = arrayListOf<Node>()
+
+    private lateinit var accData: Array<*>
+    private lateinit var gyroData: Array<*>
+    private lateinit var magnetData: Array<*>
 
     private var test = arrayListOf<Array<*>>()
 
@@ -99,13 +104,15 @@ class SaveDataFragment : Fragment() {
 
             val poseData = arrayOf(sessionNumber, timeStamp, poseTx, poseTy, poseTz, poseQx, poseQy, poseQz, poseQw)
 
-            val accData = arrayOf(timeStamp, it.ax, it.ay, it.az)
-            val gyroData = arrayOf(timeStamp, it.gx, it.gy, it.gz)
-            val magnetData = arrayOf(timeStamp, it.mx, it.my, it.mz)
+            accData = arrayOf(timeStamp, it.ax, it.ay, it.az)
+            gyroData = arrayOf(timeStamp, it.gx, it.gy, it.gz)
+            magnetData = arrayOf(timeStamp, it.mx, it.my, it.mz)
 
-            bind.tvAcc.text     = accData.toString()
-            bind.tvGyro.text    = gyroData.toString()
-            bind.tvMagnet.text  = magnetData.toString()
+            Log.e("POSE", "$poseTx, $poseTy, $poseTz, $poseQx, $poseQy, $poseQz, $poseQw")
+            Log.e("ACC", "${it.ax} ${it.ay} ${it.az}")
+            Log.e("GYRO", "${it.gx} ${it.gy} ${it.gz}")
+            Log.e("MAGNET", "${it.mx} ${it.my} ${it.mz}")
+
             bind.tvCurPos.text  = "$poseTx $poseTy $poseTz $poseQx $poseQy $poseQz $poseQw"
 
             // Record 버튼 눌렀고, 앵커가 하나 이상일 때
@@ -131,10 +138,10 @@ class SaveDataFragment : Fragment() {
 
                 // 가속도, 자이로, 카메라 위치, 앵커 위치 저장
 
-                accList.add(accData)
-                gyroList.add(gyroData)
-                magnetList.add(magnetData)
-                poseList.add(poseData)
+                if(accData.isNotEmpty())    accList.add(accData)
+                if(gyroData.isNotEmpty())   gyroList.add(gyroData)
+                if(magnetData.isNotEmpty()) magnetList.add(magnetData)
+                if(poseData.isNotEmpty())   poseList.add(poseData)
 
                 test.add(accData)
             }

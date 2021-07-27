@@ -26,7 +26,7 @@
                 android:id="@+id/save_ar_fragment"
                 class="com.example.arproj.view.CustomArFragment"
                 android:layout_width="match_parent"
-                android:layout_height="670dp" />
+                android:layout_height="730dp" />
         </LinearLayout>
 
         <com.google.android.material.floatingactionbutton.FloatingActionButton
@@ -69,84 +69,44 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/tv_start_pos" />
 
-        <TextView
-            android:id="@+id/tv_acc"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="20dp"
-            android:layout_marginEnd="20dp"
-            android:textSize="10dp"
-            android:textColor="@color/black"
-            android:text="Accelerometer"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/tv_cur_pos"/>
-
-        <TextView
-            android:id="@+id/tv_gyro"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="20dp"
-            android:layout_marginEnd="20dp"
-            android:textSize="10dp"
-            android:textColor="@color/black"
-            android:text="Gyroscope"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/tv_acc"/>
-
-        <TextView
-            android:id="@+id/tv_magnet"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="20dp"
-            android:layout_marginEnd="20dp"
-            android:textSize="10dp"
-            android:textColor="@color/black"
-            android:text="MagnetField"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/tv_gyro"/>
-
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="10dp"
             android:layout_marginStart="20dp"
             android:layout_marginEnd="20dp"
             android:orientation="horizontal"
             android:weightSum="3"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/tv_magnet">
+            app:layout_constraintTop_toBottomOf="@+id/tv_cur_pos">
 
             <com.google.android.material.button.MaterialButton
-                android:text="Record"
-                style="?materialButtonOutlinedStyle"
-                android:textColor="@color/etri"
-                android:layout_weight="1"
                 android:id="@+id/btn_record"
+                style="?materialButtonOutlinedStyle"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                app:strokeWidth="2dp"
-                app:strokeColor="@color/etri"/>
+                android:layout_weight="1"
+                android:text="Record"
+                android:textColor="@color/etri"
+                app:strokeColor="@color/etri"
+                app:strokeWidth="2dp" />
 
             <View
-                android:layout_weight="1"
                 android:layout_width="0dp"
-                android:layout_height="0dp"/>
+                android:layout_height="0dp"
+                android:layout_weight="1" />
 
             <com.google.android.material.button.MaterialButton
-                android:text="Save"
-                style="?materialButtonOutlinedStyle"
-                android:enabled="false"
-                android:textColor="@color/etri"
-                android:layout_weight="1"
                 android:id="@+id/btn_save"
+                style="?materialButtonOutlinedStyle"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                app:strokeWidth="2dp"
-                app:strokeColor="@color/etri"/>
+                android:layout_weight="1"
+                android:enabled="false"
+                android:text="Save"
+                android:textColor="@color/etri"
+                app:strokeColor="@color/etri"
+                app:strokeWidth="2dp" />
 
         </LinearLayout>
 

@@ -37,20 +37,27 @@ class SensorViewModel(application: Application): AndroidViewModel(application) {
             when(event.sensor){
                 accelerometer -> {
                     System.arraycopy(event.values, 0, accValues, 0, event.values.size)
-                    if(!isAccRunning)   isAccRunning = true
                 }
                 gyroscope -> {
                     System.arraycopy(event.values, 0, gyroValues, 0, event.values.size)
-                    if(!isGyroRunning)   isGyroRunning = true
                 }
                 magnetField -> {
                     System.arraycopy(event.values, 0, magnetValues, 0, event.values.size)
-                    if(!isMagnetRunning)    isMagnetRunning = true
                 }
             }
 
-            if(isAccRunning || isGyroRunning || isMagnetRunning){
-                val sensorData = SensorData(accValues[0], accValues[1], accValues[2], gyroValues[0], gyroValues[1], gyroValues[2], magnetValues[0], magnetValues[1], magnetValues[2])
+            if(accValues.isNotEmpty() && gyroValues.isNotEmpty() && magnetValues.isNotEmpty()) {
+                val sensorData = SensorData(
+                    accValues[0],
+                    accValues[1],
+                    accValues[2],
+                    gyroValues[0],
+                    gyroValues[1],
+                    gyroValues[2],
+                    magnetValues[0],
+                    magnetValues[1],
+                    magnetValues[2]
+                )
                 postValue(sensorData)
             }
         }
@@ -66,9 +73,9 @@ class SensorViewModel(application: Application): AndroidViewModel(application) {
                 sm.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD).let { mag ->
                     this.magnetField = mag
                 }
-                sm.registerListener(this, this.accelerometer, SensorManager.SENSOR_DELAY_NORMAL)
-                sm.registerListener(this, this.gyroscope, SensorManager.SENSOR_DELAY_NORMAL)
-                sm.registerListener(this, this.magnetField, SensorManager.SENSOR_DELAY_NORMAL)
+                sm.registerListener(this, this.accelerometer, SensorManager.SENSOR_DELAY_FASTEST)
+                sm.registerListener(this, this.gyroscope, SensorManager.SENSOR_DELAY_FASTEST)
+                sm.registerListener(this, this.magnetField, SensorManager.SENSOR_DELAY_FASTEST)
             }
         }
 
@@ -82,8 +89,7 @@ class SensorViewModel(application: Application): AndroidViewModel(application) {
     }
 
     companion object{
-        val TAG: String = this::class.java.simpleName
-        const val NS2S: Float = 1.0f/1000000000.0f
+        val TAG: String = SensorViewModel::class.java.simpleName
     }
 
     data class SensorData(

@@ -13,7 +13,7 @@ class CsvWriter(private val filePath: String) {
             val fw = BufferedWriter(FileWriter("$filePath/$fileName", true))
 
             for(array in dataList){
-                fw.write(processArray(array))
+                fw.write(arrayToStringWithComma(array))
                 fw.newLine()
             }
 
@@ -24,7 +24,7 @@ class CsvWriter(private val filePath: String) {
         }
     }
 
-    private fun processArray(data: Array<*>): String{
+    private fun arrayToStringWithComma(data: Array<*>): String{
         val sb = StringBuilder()
 
         for(item in data){
