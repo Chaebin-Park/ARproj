@@ -28,7 +28,7 @@ class CsvWriter(private val filePath: String) {
         val sb = StringBuilder()
 
         for(item in data){
-            if(sb.length > 1){
+            if(sb.isNotEmpty()){
                 sb.append(',')
             }
             sb.append(item)

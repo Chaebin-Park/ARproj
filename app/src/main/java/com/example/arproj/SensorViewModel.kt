@@ -9,8 +9,7 @@ import android.hardware.SensorManager
 import android.util.Log
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
-import kotlin.math.pow
-import kotlin.math.sqrt
+import java.util.*
 
 class SensorViewModel(application: Application): AndroidViewModel(application) {
 
@@ -28,10 +27,6 @@ class SensorViewModel(application: Application): AndroidViewModel(application) {
         private var gyroValues = FloatArray(3)
         private var magnetValues = FloatArray(3)
 
-        private var isAccRunning = false
-        private var isGyroRunning = false
-        private var isMagnetRunning = false
-
         override fun onSensorChanged(event: SensorEvent) {
 
             when(event.sensor){
@@ -46,8 +41,12 @@ class SensorViewModel(application: Application): AndroidViewModel(application) {
                 }
             }
 
-            if(accValues.isNotEmpty() && gyroValues.isNotEmpty() && magnetValues.isNotEmpty()) {
+            if((accValues.isNotEmpty() && gyroValues.isNotEmpty() && magnetValues.isNotEmpty()) && event.sensor == accelerometer) {
+
+                val time = Date().time + (event.timestamp - System.nanoTime()) / 1000000L
+
                 val sensorData = SensorData(
+                    time,
                     accValues[0],
                     accValues[1],
                     accValues[2],
@@ -58,6 +57,7 @@ class SensorViewModel(application: Application): AndroidViewModel(application) {
                     magnetValues[1],
                     magnetValues[2]
                 )
+
                 postValue(sensorData)
             }
         }
@@ -90,9 +90,11 @@ class SensorViewModel(application: Application): AndroidViewModel(application) {
 
     companion object{
         val TAG: String = SensorViewModel::class.java.simpleName
+        const val NS2MS = 1.0f / 1000000.0f
     }
 
     data class SensorData(
+        val timeStamp: Long,
         val ax: Float,
         val ay: Float,
         val az: Float,
