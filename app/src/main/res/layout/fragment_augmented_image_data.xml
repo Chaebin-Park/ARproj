@@ -28,10 +28,49 @@
                 android:layout_width="match_parent"
                 android:layout_height="750dp" />
 
-            <ImageView
-                android:id="@+id/tracking_state_view"
-                android:layout_width="50dp"
-                android:layout_height="50dp"/>
+            <TextView
+                android:id="@+id/tv_tracking_state"
+                android:gravity="center"
+                android:background="@color/black"
+                android:textColor="@color/white"
+                android:textStyle="bold"
+                android:text="TRACKING"
+                android:layout_width="100dp"
+                android:layout_height="30dp"/>
+
+            <TextView
+                android:id="@+id/tv_paused_state"
+                android:gravity="center"
+                android:background="@color/black"
+                android:textColor="@color/white"
+                android:textStyle="bold"
+                android:text="PAUSED"
+                android:layout_width="100dp"
+                android:layout_height="30dp"
+                android:layout_marginTop="30dp"/>
+
+            <TextView
+                android:id="@+id/tv_image"
+                android:layout_width="60dp"
+                android:layout_height="30dp"
+                android:layout_marginTop="60dp"
+                android:background="@color/black"
+                android:gravity="center"
+                android:text="IMAGE : "
+                android:textColor="@color/white"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/tv_image_number"
+                android:layout_width="40dp"
+                android:layout_height="30dp"
+                android:layout_marginTop="60dp"
+                android:layout_marginStart="60dp"
+                android:background="@color/black"
+                android:gravity="center"
+                android:text="-1"
+                android:textColor="@color/white"
+                android:textStyle="bold" />
         </FrameLayout>
 
         <com.google.android.material.floatingactionbutton.FloatingActionButton

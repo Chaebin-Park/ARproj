@@ -10,6 +10,9 @@ class CustomAugmentedImageArFragment: CustomArFragment() {
         planeDiscoveryController.setInstructionView(null)
         val config = Config(session)
         config.updateMode = Config.UpdateMode.LATEST_CAMERA_IMAGE
+
+        if(config.focusMode == Config.FocusMode.FIXED)  config.focusMode = Config.FocusMode.AUTO
+
         session?.configure(config)
 
         arSceneView.setupSession(session)

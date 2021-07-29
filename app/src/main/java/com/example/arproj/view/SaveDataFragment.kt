@@ -202,6 +202,7 @@ class SaveDataFragment : Fragment() {
     }
 
     private fun clearData(){
+        isRecord = false
         poseList.clear()
         accList.clear()
         magnetList.clear()

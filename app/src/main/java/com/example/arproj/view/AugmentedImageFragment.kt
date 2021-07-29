@@ -1,6 +1,7 @@
 package com.example.arproj.view
 
 import android.annotation.SuppressLint
+import android.graphics.Color
 import android.graphics.drawable.Drawable
 import android.os.Build
 import android.os.Bundle
@@ -18,8 +19,10 @@ import com.example.arproj.SensorViewModel
 import com.example.arproj.databinding.FragmentAugmentedImageDataBinding
 import com.google.ar.core.*
 import com.google.ar.sceneform.FrameTime
+import kotlinx.coroutines.CoroutineScope
 import java.text.SimpleDateFormat
 import java.util.*
+import kotlin.concurrent.thread
 import kotlin.math.round
 
 
@@ -80,7 +83,6 @@ class AugmentedImageFragment : Fragment() {
         bind.fabReset.setOnClickListener{
             clearData()
             bind.btnSave.isEnabled = false
-//            bind.trackingStateView.setImageResource(0)
         }
 
         return bind.root
@@ -90,20 +92,10 @@ class AugmentedImageFragment : Fragment() {
         super.onResume()
 
         arFragment.planeDiscoveryController.hide()
+
         arFragment.arSceneView.scene.addOnUpdateListener(this::onUpdateFrame)
 
-        //Check if ARSession is null. If it is, instantiate it
-//        if(arSession == null) {
-//            arSession = Session(requireContext())
-//            arSession?.setupAutofocus()
-////            arFragment.planeDiscoveryController.hide()
-//            arFragment.arSceneView.scene.addOnUpdateListener(this::onUpdateFrame)
-//        }
-
         viewModel.sensorLiveData.observe(viewLifecycleOwner, {
-//            val timeStamp = System.currentTimeMillis().toString()
-
-            val ts = System.nanoTime()
             val camera = arFragment.arSceneView.scene.camera
 
             val poseTx = round(camera.worldPosition.normalized().x * DEC) / DEC
@@ -130,6 +122,7 @@ class AugmentedImageFragment : Fragment() {
     }
 
     private fun clearData(){
+        isRecord = false
         poseList.clear()
         accList.clear()
         gyroList.clear()
@@ -149,18 +142,25 @@ class AugmentedImageFragment : Fragment() {
     }
 
     private fun manageImageTrackingState(image: AugmentedImage){
+        Log.e("ZZZ", image.trackingMethod.name)
+
+        // AugmentedImage.TrackingMethod.FULL_TRACKING -> 이거 확인해봐야함
+
         when(image.trackingState){
             TrackingState.TRACKING -> {
-//                bind.trackingStateView.setImageResource(0)
-//                bind.trackingStateView.setBackgroundColor(Color.parseColor("#00FF00"))
+
             }
             TrackingState.PAUSED -> {
+//                if(!isRecord)   startRecord()
                 showToast("Record: ${image.name}")
-//                changeImage(image.name)
-                startRecord()
+                bind.tvPausedState.setBackgroundColor(Color.GREEN)
+                bind.tvImageNumber.text = "${image.index}"
                 trackingStateNumber = image.index
+//                Log.e("ZZZ", "PAUSED")
             }
             TrackingState.STOPPED -> {
+                showToast("STOPPPPPPPPPPPPPP")
+//                Log.e("ZZZ", "STOPPED")
             }
             else -> {
                 showToast("It cant be...")
@@ -171,38 +171,6 @@ class AugmentedImageFragment : Fragment() {
     private fun startRecord(){
         isRecord = true
         bind.btnSave.isEnabled = true
-    }
-
-    private fun changeImage(fileName: String){
-        val assetManager = resources.assets
-        val inputStream = assetManager.open(fileName)
-        bind.trackingStateView.setImageDrawable(Drawable.createFromStream(inputStream, null))
-        inputStream.close()
-    }
-
-    private fun Session.setupAutofocus() {
-
-        //Create the config
-        arConfig = Config(this)
-
-        //Check if the configuration is set to fixed
-        if (arConfig?.focusMode == Config.FocusMode.FIXED)
-            arConfig?.focusMode = Config.FocusMode.AUTO
-
-        //Sceneform requires that the ARCore session is configured to the UpdateMode LATEST_CAMERA_IMAGE.
-        //This is probably not required for just auto focus. I was updating the camera configuration as well
-        arConfig?.updateMode = Config.UpdateMode.LATEST_CAMERA_IMAGE
-
-        //Reconfigure the session
-        configure(arConfig)
-
-        //Setup the session with ARSceneView
-        arFragment.planeDiscoveryController.hide()
-        arFragment.arSceneView.setupSession(this)
-//        arFragment.arSceneView.scene.addOnUpdateListener(this::onUpdateFrame)
-
-        //log out if the camera is in auto focus mode
-//        ARApplication.log("The camera is current in focus mode : ${config.focusMode.name}")
     }
 
     private fun init(binding: FragmentAugmentedImageDataBinding){
