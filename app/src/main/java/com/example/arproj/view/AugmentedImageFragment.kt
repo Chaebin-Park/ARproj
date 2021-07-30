@@ -42,6 +42,9 @@ class AugmentedImageFragment : Fragment() {
 
     private var timeStamp: Long = 0L
 
+
+
+
     @SuppressLint("SimpleDateFormat")
     @RequiresApi(Build.VERSION_CODES.R)
     override fun onCreateView(
