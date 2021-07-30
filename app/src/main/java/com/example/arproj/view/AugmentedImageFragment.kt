@@ -2,7 +2,6 @@ package com.example.arproj.view
 
 import android.annotation.SuppressLint
 import android.graphics.Color
-import android.graphics.drawable.Drawable
 import android.os.Build
 import android.os.Bundle
 import android.util.Log
@@ -19,10 +18,8 @@ import com.example.arproj.SensorViewModel
 import com.example.arproj.databinding.FragmentAugmentedImageDataBinding
 import com.google.ar.core.*
 import com.google.ar.sceneform.FrameTime
-import kotlinx.coroutines.CoroutineScope
 import java.text.SimpleDateFormat
 import java.util.*
-import kotlin.concurrent.thread
 import kotlin.math.round
 
 
@@ -37,13 +34,13 @@ class AugmentedImageFragment : Fragment() {
     private var sessionNumber = 0
     private var isRecord = false
 
-    private var accList = arrayListOf<Array<*>>()
-    private var gyroList = arrayListOf<Array<*>>()
-    private var magnetList = arrayListOf<Array<*>>()
-    private var poseList = arrayListOf<Array<*>>()
+    private var accArrayList = arrayListOf<Array<*>>()
+    private var gyroArrayList = arrayListOf<Array<*>>()
+    private var magnetArrayList = arrayListOf<Array<*>>()
+    private var cameraPoseArrayList = arrayListOf<Array<*>>()
+    private var imagePoseArrayList = arrayListOf<Array<*>>()
 
-    private var arSession: Session? = null
-    private var arConfig: Config? = null
+    private var timeStamp: Long = 0L
 
     @SuppressLint("SimpleDateFormat")
     @RequiresApi(Build.VERSION_CODES.R)
@@ -66,10 +63,11 @@ class AugmentedImageFragment : Fragment() {
             isRecord = false
             it.isEnabled = isRecord
 
-            arActivity.saveArrayToCSV(formatDate, "A_I_Acc.csv", accList)
-            arActivity.saveArrayToCSV(formatDate, "A_I_Gyro.csv", gyroList)
-            arActivity.saveArrayToCSV(formatDate, "A_I_Pose.csv", poseList)
-            arActivity.saveArrayToCSV(formatDate, "A_I_Mag.csv", magnetList)
+            arActivity.saveArrayToCSV(formatDate, "A_I_Acc.csv", accArrayList)
+            arActivity.saveArrayToCSV(formatDate, "A_I_Gyro.csv", gyroArrayList)
+            arActivity.saveArrayToCSV(formatDate, "A_I_CameraPose.csv", cameraPoseArrayList)
+            arActivity.saveArrayToCSV(formatDate, "A_I_Mag.csv", magnetArrayList)
+            arActivity.saveArrayToCSV(formatDate, "A_I_ImagePose.csv", imagePoseArrayList)
 
             clearData()
             showToast("Save Data")
@@ -96,6 +94,8 @@ class AugmentedImageFragment : Fragment() {
         arFragment.arSceneView.scene.addOnUpdateListener(this::onUpdateFrame)
 
         viewModel.sensorLiveData.observe(viewLifecycleOwner, {
+            timeStamp = it.timeStamp
+
             val camera = arFragment.arSceneView.scene.camera
 
             val poseTx = round(camera.worldPosition.normalized().x * DEC) / DEC
@@ -113,20 +113,21 @@ class AugmentedImageFragment : Fragment() {
             val magnetData = arrayOf(it.timeStamp,sessionNumber, trackingStateNumber, it.mx, it.my, it.mz)
 
             if(isRecord){
-                accList.add(accData)
-                gyroList.add(gyroData)
-                magnetList.add(magnetData)
-                poseList.add(poseData)
+                accArrayList.add(accData)
+                gyroArrayList.add(gyroData)
+                magnetArrayList.add(magnetData)
+                cameraPoseArrayList.add(poseData)
             }
         })
     }
 
     private fun clearData(){
         isRecord = false
-        poseList.clear()
-        accList.clear()
-        gyroList.clear()
-        magnetList.clear()
+        cameraPoseArrayList.clear()
+        accArrayList.clear()
+        gyroArrayList.clear()
+        magnetArrayList.clear()
+        imagePoseArrayList.clear()
     }
 
     private fun onUpdateFrame(frameTime: FrameTime){
@@ -142,25 +143,58 @@ class AugmentedImageFragment : Fragment() {
     }
 
     private fun manageImageTrackingState(image: AugmentedImage){
-        Log.e("ZZZ", image.trackingMethod.name)
+        printLog("Method: ${image.trackingMethod.name} | State: ${image.trackingState.name} | ${image.index}")
 
-        // AugmentedImage.TrackingMethod.FULL_TRACKING -> 이거 확인해봐야함
+        if(isRecord){
+            imagePoseArrayList.add(arrayOf(
+                timeStamp,
+                sessionNumber,
+                image.index,
+                image.centerPose.tx(),
+                image.centerPose.ty(),
+                image.centerPose.tz(),
+                image.centerPose.qx(),
+                image.centerPose.qy(),
+                image.centerPose.qz(),
+                image.centerPose.qw(),
+            ))
+        }
 
         when(image.trackingState){
             TrackingState.TRACKING -> {
-
+                bind.tvPausedStateNotTracking.setBackgroundColor(Color.BLACK)
+                when(image.trackingMethod){
+                    AugmentedImage.TrackingMethod.FULL_TRACKING -> {
+                        ifImageRecognized(image)
+                        viewImagePose(image)
+                        bind.tvTrackingStateFullTracking.setBackgroundColor(Color.GREEN)
+                        bind.tvTrackingStateLastKnownPose.setBackgroundColor(Color.BLACK)
+                    }
+                    AugmentedImage.TrackingMethod.LAST_KNOWN_POSE -> {
+                        viewImagePose(image)
+                        bind.tvTrackingStateFullTracking.setBackgroundColor(Color.BLACK)
+                        bind.tvTrackingStateLastKnownPose.setBackgroundColor(Color.GREEN)
+                    }
+                    else -> {
+                        showToast("It cant be...")
+                    }
+                }
             }
             TrackingState.PAUSED -> {
-//                if(!isRecord)   startRecord()
-                showToast("Record: ${image.name}")
-                bind.tvPausedState.setBackgroundColor(Color.GREEN)
-                bind.tvImageNumber.text = "${image.index}"
-                trackingStateNumber = image.index
-//                Log.e("ZZZ", "PAUSED")
+                when(image.trackingMethod){
+                    AugmentedImage.TrackingMethod.NOT_TRACKING -> {
+                        if(!isRecord)   startRecord()
+                        ifImageRecognized(image)
+                        viewImagePose(image)
+                        bind.tvPausedStateNotTracking.setBackgroundColor(Color.GREEN)
+                    }
+                    else -> {
+                        showToast("It cant be...")
+                    }
+                }
             }
             TrackingState.STOPPED -> {
-                showToast("STOPPPPPPPPPPPPPP")
-//                Log.e("ZZZ", "STOPPED")
+                showToast("STOPPED")
             }
             else -> {
                 showToast("It cant be...")
@@ -168,7 +202,25 @@ class AugmentedImageFragment : Fragment() {
         }
     }
 
+    private fun ifImageRecognized(image: AugmentedImage){
+        showToast("${image.name} recognized ")
+        bind.tvImageNumber.text = "${image.index}"
+        trackingStateNumber = image.index
+    }
+
+    @SuppressLint("SetTextI18n")
+    private fun viewImagePose(image: AugmentedImage){
+        bind.tvImageXPose.text = String.format("%.6f", image.centerPose.tx())
+        bind.tvImageYPose.text = String.format("%.6f", image.centerPose.ty())
+        bind.tvImageZPose.text = String.format("%.6f", image.centerPose.tz())
+        bind.tvImageXRotation.text = String.format("%.6f", image.centerPose.qx())
+        bind.tvImageYRotation.text = String.format("%.6f", image.centerPose.qy())
+        bind.tvImageZRotation.text = String.format("%.6f", image.centerPose.qz())
+        bind.tvImageWRotation.text = String.format("%.6f", image.centerPose.qw())
+    }
+
     private fun startRecord(){
+        printLog("Start Record")
         isRecord = true
         bind.btnSave.isEnabled = true
     }

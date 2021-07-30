@@ -28,49 +28,300 @@
                 android:layout_width="match_parent"
                 android:layout_height="750dp" />
 
-            <TextView
-                android:id="@+id/tv_tracking_state"
-                android:gravity="center"
-                android:background="@color/black"
-                android:textColor="@color/white"
-                android:textStyle="bold"
-                android:text="TRACKING"
-                android:layout_width="100dp"
-                android:layout_height="30dp"/>
+            <LinearLayout
+                android:layout_width="150dp"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
 
-            <TextView
-                android:id="@+id/tv_paused_state"
-                android:gravity="center"
-                android:background="@color/black"
-                android:textColor="@color/white"
-                android:textStyle="bold"
-                android:text="PAUSED"
-                android:layout_width="100dp"
-                android:layout_height="30dp"
-                android:layout_marginTop="30dp"/>
+                <TextView
+                    android:id="@+id/tv_tracking_state"
+                    android:gravity="center"
+                    android:background="@color/black"
+                    android:textColor="@color/white"
+                    android:textStyle="bold"
+                    android:text="TRACKING"
+                    android:layout_width="match_parent"
+                    android:layout_height="30dp"/>
 
-            <TextView
-                android:id="@+id/tv_image"
-                android:layout_width="60dp"
-                android:layout_height="30dp"
-                android:layout_marginTop="60dp"
-                android:background="@color/black"
-                android:gravity="center"
-                android:text="IMAGE : "
-                android:textColor="@color/white"
-                android:textStyle="bold" />
+                <TextView
+                    android:id="@+id/tv_tracking_state_full_tracking"
+                    android:gravity="center"
+                    android:background="@color/black"
+                    android:textColor="@color/white"
+                    android:textStyle="bold"
+                    android:text="FULL_TRACKING"
+                    android:layout_width="match_parent"
+                    android:layout_height="30dp"/>
 
-            <TextView
-                android:id="@+id/tv_image_number"
-                android:layout_width="40dp"
-                android:layout_height="30dp"
-                android:layout_marginTop="60dp"
-                android:layout_marginStart="60dp"
-                android:background="@color/black"
-                android:gravity="center"
-                android:text="-1"
-                android:textColor="@color/white"
-                android:textStyle="bold" />
+                <TextView
+                    android:id="@+id/tv_tracking_state_last_known_pose"
+                    android:gravity="center"
+                    android:background="@color/black"
+                    android:textColor="@color/white"
+                    android:textStyle="bold"
+                    android:text="LAST_KNOWN_POSE"
+                    android:layout_width="match_parent"
+                    android:layout_height="30dp"/>
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:layout_gravity="end">
+                <TextView
+                    android:id="@+id/tv_paused_state"
+                    android:gravity="center"
+                    android:background="@color/black"
+                    android:textColor="@color/white"
+                    android:textStyle="bold"
+                    android:text="PAUSED"
+                    android:layout_width="120dp"
+                    android:layout_height="30dp" />
+
+                <TextView
+                    android:id="@+id/tv_paused_state_not_tracking"
+                    android:gravity="center"
+                    android:background="@color/black"
+                    android:textColor="@color/white"
+                    android:textStyle="bold"
+                    android:text="NOT_TRACKING"
+                    android:layout_width="120dp"
+                    android:layout_height="30dp" />
+
+            </LinearLayout>
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="630dp"
+                android:orientation="vertical">
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="30dp">
+
+                    <TextView
+                        android:id="@+id/tv_image"
+                        android:layout_width="80dp"
+                        android:layout_height="30dp"
+                        android:background="@color/black"
+                        android:gravity="center"
+                        android:text="IMAGE : "
+                        android:textColor="@color/white"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:id="@+id/tv_image_number"
+                        android:layout_width="40dp"
+                        android:layout_height="30dp"
+                        android:background="@color/black"
+                        android:gravity="center"
+                        android:layout_gravity="center"
+                        android:text="-1"
+                        android:textColor="@color/white"
+                        android:textStyle="bold" />
+                </LinearLayout>
+
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal">
+                        <TextView
+                            android:id="@+id/tv_tx"
+                            android:layout_width="30dp"
+                            android:layout_height="30dp"
+                            android:background="@color/black"
+                            android:gravity="center"
+                            android:text="tx : "
+                            android:textColor="@color/white"
+                            android:textStyle="bold" />
+
+                        <TextView
+                            android:id="@+id/tv_image_x_pose"
+                            android:layout_width="90dp"
+                            android:layout_height="30dp"
+                            android:background="@color/black"
+                            android:gravity="center"
+                            android:text="x pose"
+                            android:textColor="@color/white"
+                            android:textStyle="bold" />
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal">
+                        <TextView
+                            android:id="@+id/tv_ty"
+                            android:layout_width="30dp"
+                            android:layout_height="30dp"
+                            android:background="@color/black"
+                            android:gravity="center"
+                            android:text="ty : "
+                            android:textColor="@color/white"
+                            android:textStyle="bold" />
+
+                        <TextView
+                            android:id="@+id/tv_image_y_pose"
+                            android:layout_width="90dp"
+                            android:layout_height="30dp"
+                            android:background="@color/black"
+                            android:gravity="center"
+                            android:text="y pose"
+                            android:textColor="@color/white"
+                            android:textStyle="bold" />
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal">
+                        <TextView
+                            android:id="@+id/tv_tz"
+                            android:layout_width="30dp"
+                            android:layout_height="30dp"
+                            android:background="@color/black"
+                            android:gravity="center"
+                            android:text="tz : "
+                            android:textColor="@color/white"
+                            android:textStyle="bold" />
+
+                        <TextView
+                            android:id="@+id/tv_image_z_pose"
+                            android:layout_width="90dp"
+                            android:layout_height="30dp"
+                            android:background="@color/black"
+                            android:gravity="center"
+                            android:text="z pose"
+                            android:textColor="@color/white"
+                            android:textStyle="bold" />
+                    </LinearLayout>
+
+                </LinearLayout>
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="630dp"
+                android:layout_marginStart="120dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal">
+                        <TextView
+                            android:id="@+id/tv_qx"
+                            android:layout_width="30dp"
+                            android:layout_height="30dp"
+                            android:background="@color/black"
+                            android:gravity="center"
+                            android:text="qx : "
+                            android:textColor="@color/white"
+                            android:textStyle="bold" />
+
+                        <TextView
+                            android:id="@+id/tv_image_x_rotation"
+                            android:layout_width="90dp"
+                            android:layout_height="30dp"
+                            android:background="@color/black"
+                            android:gravity="center"
+                            android:text="x rotation"
+                            android:textColor="@color/white"
+                            android:textStyle="bold" />
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal">
+                        <TextView
+                            android:id="@+id/tv_qy"
+                            android:layout_width="30dp"
+                            android:layout_height="30dp"
+                            android:background="@color/black"
+                            android:gravity="center"
+                            android:text="qy : "
+                            android:textColor="@color/white"
+                            android:textStyle="bold" />
+
+                        <TextView
+                            android:id="@+id/tv_image_y_rotation"
+                            android:layout_width="90dp"
+                            android:layout_height="30dp"
+                            android:background="@color/black"
+                            android:gravity="center"
+                            android:text="y rotation"
+                            android:textColor="@color/white"
+                            android:textStyle="bold" />
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal">
+                        <TextView
+                            android:id="@+id/tv_qz"
+                            android:layout_width="30dp"
+                            android:layout_height="30dp"
+                            android:background="@color/black"
+                            android:gravity="center"
+                            android:text="qz : "
+                            android:textColor="@color/white"
+                            android:textStyle="bold" />
+
+                        <TextView
+                            android:id="@+id/tv_image_z_rotation"
+                            android:layout_width="90dp"
+                            android:layout_height="30dp"
+                            android:background="@color/black"
+                            android:gravity="center"
+                            android:text="z rotation"
+                            android:textColor="@color/white"
+                            android:textStyle="bold" />
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal">
+                        <TextView
+                            android:id="@+id/tv_qw"
+                            android:layout_width="30dp"
+                            android:layout_height="30dp"
+                            android:background="@color/black"
+                            android:gravity="center"
+                            android:text="qw : "
+                            android:textColor="@color/white"
+                            android:textStyle="bold" />
+
+                        <TextView
+                            android:id="@+id/tv_image_w_rotation"
+                            android:layout_width="90dp"
+                            android:layout_height="30dp"
+                            android:background="@color/black"
+                            android:gravity="center"
+                            android:text="w rotation"
+                            android:textColor="@color/white"
+                            android:textStyle="bold" />
+                    </LinearLayout>
+
+                </LinearLayout>
+            </LinearLayout>
+
         </FrameLayout>
 
         <com.google.android.material.floatingactionbutton.FloatingActionButton
